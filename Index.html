@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>QuickBazaar</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .product { border:1px solid #ccc; margin:10px; padding:10px; border-radius:5px; width:250px; display:inline-block; vertical-align:top; }
+    .product img { width:100%; height:150px; object-fit:cover; }
+    .product h3 { margin:5px 0; }
+  </style>
+</head>
+<body>
+
+<h1>QuickBazaar Products</h1>
+<div id="products">Loading products...</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDdNcqKl5dCXNq-sXcfKZEeEmPT38gMfbI",
+    authDomain: "quickbazaar-be247.firebaseapp.com",
+    projectId: "quickbazaar-be247"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const productsDiv = document.getElementById("products");
+
+  try {
+    const snapshot = await getDocs(collection(db, "products"));
+    productsDiv.innerHTML = "";
+
+    snapshot.forEach(doc => {
+      const p = doc.data();
+      productsDiv.innerHTML += `
+        <div class="product">
+          <img src="${p.imageUrl || 'https://via.placeholder.com/250x150'}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p>Price: Rs ${p.price}</p>
+          <p>Stock: ${p.stock}</p>
+          <p>Category: ${p.category}</p>
+        </div>
+      `;
+    });
+  } catch (e) {
+    productsDiv.innerHTML = "Error loading products";
+    console.error(e);
+  }
+</script>
+
+</body>
+</html>
